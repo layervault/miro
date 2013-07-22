@@ -36,7 +36,7 @@ module Miro
       colors = sort_by_dominant_color
       cleanup_temporary_files!
 
-      return colors
+      return colors.first(Miro.options[:color_count])
     end
 
     def remote_source_image?
