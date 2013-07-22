@@ -31,26 +31,16 @@ module Miro
 
   private
     def extract_colors_from_image
-      # downsample_colors_and_convert_to_png!
+      @source_image = open_source_image
+
       colors = sort_by_dominant_color
       cleanup_temporary_files!
+
       return colors
     end
 
     def remote_source_image?
       @src_image_path =~ /^https?:\/\//
-    end
-
-    def downsample_colors_and_convert_to_png!
-      @source_image = open_source_image
-      @downsampled_image = open_downsampled_image
-
-      Cocaine::CommandLine.new(Miro.options[:image_magick_path], "':in[0]' -resize :resolution -colors :colors -colorspace :quantize -quantize :quantize :out").
-        run(:in => File.expand_path(@source_image.path),
-            :resolution => Miro.options[:resolution],
-            :colors => Miro.options[:color_count].to_s,
-            :quantize => Miro.options[:quantize],
-            :out => File.expand_path(@downsampled_image.path))
     end
 
     def open_source_image
@@ -72,12 +62,6 @@ module Miro
       Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('1.9')
     end
 
-    def open_downsampled_image
-      tempfile = Tempfile.open(["downsampled", '.png'])
-      tempfile.binmode
-      tempfile
-    end
-
     def group_pixels_by_color
       @pixels ||= ChunkyPNG::Image.from_file(File.expand_path(@source_image.path)).pixels
       @grouped_pixels ||= @pixels.group_by { |pixel| pixel }
@@ -89,7 +73,6 @@ module Miro
 
     def cleanup_temporary_files!
       @source_image.close(true) if remote_source_image?
-      # @downsampled_image.close(true)
     end
   end
 end
