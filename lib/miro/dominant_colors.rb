@@ -31,7 +31,7 @@ module Miro
 
   private
     def extract_colors_from_image
-      downsample_colors_and_convert_to_png!
+      # downsample_colors_and_convert_to_png!
       colors = sort_by_dominant_color
       cleanup_temporary_files!
       return colors
@@ -79,7 +79,7 @@ module Miro
     end
 
     def group_pixels_by_color
-      @pixels ||= ChunkyPNG::Image.from_file(File.expand_path(@downsampled_image.path)).pixels
+      @pixels ||= ChunkyPNG::Image.from_file(File.expand_path(@source_image.path)).pixels
       @grouped_pixels ||= @pixels.group_by { |pixel| pixel }
     end
 
@@ -89,7 +89,7 @@ module Miro
 
     def cleanup_temporary_files!
       @source_image.close(true) if remote_source_image?
-      @downsampled_image.close(true)
+      # @downsampled_image.close(true)
     end
   end
 end
